@@ -1,4 +1,4 @@
-Alright so you know how YouTube is blocked at Hicksville schools and it’s honestly annoying when you’re trying to watch something for class… or just kill time?
+Alright so you know how YouTube is blocked at Hicksville schools and it’s honestly annoying when you’re trying to watch something for class, And especially when you're bored when everyone else is state testing.
 
 Yeah, I made something for that.
 
@@ -20,3 +20,15 @@ And it runs through a privacy-friendly player, so it’s way more likely to work
 Basically, it turns “YouTube is blocked” into “doesn’t matter.”
 
 If you’re at Hicksville and you’ve ever been annoyed by YouTube being blocked, just use this. It’s simple, fast, and it actually works.
+
+If you're having any issues please comment on this Github page or talk to Colton Slattery About the issue
+
+BTW I GOT THE IDEA FROM WETUBE, THANK Wetube for having it open source. I would I would have never been able to figure this out without your Guys this video player.
+
+
+The site might be slow this year but I will try to fix that eventually but right now I'm focused on other things especially since state testing is coming I don't got much time I will try to do it during track meets. 
+If your site is not loading correctly or is turning white Please host it yourself using a html site hoster. This issue should be fixed sometime after state testing or during state testing.
+
+My plans are for the future of this site
+Be able to watch full on Movies
+And add shorts that you can watch
