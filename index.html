@@ -57,13 +57,24 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
 
 /* LAYOUT */
 .page-wrap{display:flex;}
-.sidebar{width:240px;flex-shrink:0;padding:12px 0;position:sticky;top:104px;height:calc(100vh - 104px);overflow-y:auto;}
-.sidebar-item{display:flex;align-items:center;gap:18px;padding:9px 22px;font-size:0.875rem;cursor:pointer;border-radius:10px;margin:0 8px;transition:background 0.1s;color:var(--text);}
+.sidebar{width:240px;flex-shrink:0;padding:12px 0;position:sticky;top:104px;height:calc(100vh - 104px);overflow-y:auto;overflow-x:hidden;transition:width 0.2s ease;}
+.sidebar.mini{width:68px;}
+.sidebar.hidden{width:0;padding:0;}
+.sidebar-toggle-row{display:flex;align-items:center;justify-content:flex-end;padding:2px 10px 8px;}
+.sidebar-toggle-btn{background:var(--bg3);border:none;color:var(--text2);border-radius:6px;padding:4px 8px;font-size:0.72rem;cursor:pointer;transition:background 0.15s;white-space:nowrap;}
+.sidebar-toggle-btn:hover{background:var(--bg4);}
+.sidebar-item{display:flex;align-items:center;gap:18px;padding:9px 22px;font-size:0.875rem;cursor:pointer;border-radius:10px;margin:0 8px;transition:background 0.1s;color:var(--text);white-space:nowrap;overflow:hidden;}
+.sidebar.mini .sidebar-item{justify-content:center;padding:9px 0;gap:0;margin:0 4px;}
+.sidebar.hidden .sidebar-item,.sidebar.hidden .sidebar-toggle-row,.sidebar.hidden .sidebar-divider,.sidebar.hidden .sidebar-label{display:none;}
 .sidebar-item:hover{background:var(--bg3);}
 .sidebar-item.active{background:var(--bg3);font-weight:600;}
-.si-icon{font-size:1.15rem;width:22px;text-align:center;}
+.si-icon{font-size:1.15rem;width:22px;text-align:center;flex-shrink:0;}
+.si-label{}
+.sidebar.mini .si-label{display:none;}
 .sidebar-divider{height:1px;background:var(--border);margin:10px 16px;}
+.sidebar.mini .sidebar-divider{margin:10px 8px;}
 .sidebar-label{padding:6px 24px 3px;font-size:0.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;}
+.sidebar.mini .sidebar-label{display:none;}
 .main{flex:1;min-width:0;padding:18px 20px;}
 
 /* GRID */
@@ -112,12 +123,14 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
 /* PLAYER CONTROLS BAR */
 .player-controls{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg2);border-radius:0 0 var(--r) var(--r);flex-wrap:wrap;}
 .progress-wrap{width:100%;height:20px;display:flex;align-items:center;cursor:pointer;position:relative;}
-.progress-bg{width:100%;height:4px;background:var(--bg5);border-radius:2px;position:relative;overflow:hidden;}
-.progress-fill{height:100%;border-radius:2px;transition:width 0.3s;}
+.progress-bg{width:100%;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;position:relative;transition:height 0.1s;}
+.progress-wrap:hover .progress-bg{height:5px;}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.1s;}
 .progress-fill.partial{background:var(--red);}
 .progress-fill.full{background:var(--blue);}
-.progress-handle{position:absolute;top:50%;right:0;transform:translate(50%,-50%);width:12px;height:12px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.5);display:none;}
+.progress-handle{position:absolute;top:50%;right:0;transform:translate(50%,-50%);width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 0 4px rgba(0,0,0,0.5);display:none;transition:transform 0.1s;}
 .progress-wrap:hover .progress-handle{display:block;}
+.progress-wrap:hover .progress-handle:hover{transform:translate(50%,-50%) scale(1.2);}
 .ctrl-btn{background:none;border:none;color:var(--text2);font-size:0.95rem;padding:4px 6px;border-radius:4px;transition:all 0.15s;display:flex;align-items:center;gap:4px;font-size:0.82rem;}
 .ctrl-btn:hover{background:var(--bg3);color:var(--text);}
 .ctrl-btn.active{color:var(--blue);}
@@ -265,6 +278,137 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
   <iframe id="pipIframe" allowfullscreen allow="autoplay; picture-in-picture"></iframe>
 </div>
 
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal" style="display:none;" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-box" style="max-width:600px;max-height:88vh;overflow-y:auto;">
+    <h3>⚙️ Settings & Customization</h3>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px;">
+
+      <!-- Appearance -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:10px;color:var(--text);">🎨 Appearance</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.83rem;color:var(--text2);">Dark / Light Mode</span>
+          <button class="toggle-sw" id="settingsModeBtn" onclick="toggleMode();updateSettingsUI()"></button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.83rem;color:var(--text2);">Accent Color</span>
+          <div style="display:flex;gap:6px;">
+            <button onclick="setAccent('#ff0000')" style="width:22px;height:22px;border-radius:50%;background:#ff0000;border:2px solid transparent;cursor:pointer;" title="Red"></button>
+            <button onclick="setAccent('#3ea6ff')" style="width:22px;height:22px;border-radius:50%;background:#3ea6ff;border:2px solid transparent;cursor:pointer;" title="Blue"></button>
+            <button onclick="setAccent('#22c55e')" style="width:22px;height:22px;border-radius:50%;background:#22c55e;border:2px solid transparent;cursor:pointer;" title="Green"></button>
+            <button onclick="setAccent('#a855f7')" style="width:22px;height:22px;border-radius:50%;background:#a855f7;border:2px solid transparent;cursor:pointer;" title="Purple"></button>
+            <button onclick="setAccent('#f97316')" style="width:22px;height:22px;border-radius:50%;background:#f97316;border:2px solid transparent;cursor:pointer;" title="Orange"></button>
+            <button onclick="setAccent('#ec4899')" style="width:22px;height:22px;border-radius:50%;background:#ec4899;border:2px solid transparent;cursor:pointer;" title="Pink"></button>
+            <button onclick="setAccent('#14b8a6')" style="width:22px;height:22px;border-radius:50%;background:#14b8a6;border:2px solid transparent;cursor:pointer;" title="Teal"></button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.83rem;color:var(--text2);">Font Size</span>
+          <select id="fontSizeSel" onchange="setFontSize(this.value)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:3px 8px;border-radius:6px;font-size:0.8rem;">
+            <option value="13">Small</option>
+            <option value="15">Default</option>
+            <option value="17">Large</option>
+            <option value="20">X-Large</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:0.83rem;color:var(--text2);">Card Size</span>
+          <select id="cardSizeSel" onchange="setCardSize(this.value)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:3px 8px;border-radius:6px;font-size:0.8rem;">
+            <option value="220">Small</option>
+            <option value="290" selected>Default</option>
+            <option value="360">Large</option>
+            <option value="480">X-Large</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sidebar Control -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:10px;color:var(--text);">📌 Sidebar</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="setSidebarMode('full')" style="padding:6px 14px;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;color:var(--text);font-size:0.8rem;cursor:pointer;">Full</button>
+          <button onclick="setSidebarMode('mini')" style="padding:6px 14px;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;color:var(--text);font-size:0.8rem;cursor:pointer;">Emoji Only</button>
+          <button onclick="setSidebarMode('hidden')" style="padding:6px 14px;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;color:var(--text);font-size:0.8rem;cursor:pointer;">Hidden</button>
+        </div>
+        <p style="font-size:0.75rem;color:var(--text3);margin-top:8px;">You can also click the ◀ arrow on the sidebar to cycle through modes.</p>
+      </div>
+
+      <!-- Top Chips Customization -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:6px;color:var(--text);">🏷️ Top Tab Bar — Show / Hide Tabs</div>
+        <p style="font-size:0.75rem;color:var(--text3);margin-bottom:10px;">Toggle which tabs appear in the top chip bar.</p>
+        <div id="chipToggles" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+      <!-- Sidebar Items Customization -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:6px;color:var(--text);">📋 Sidebar — Show / Hide Items</div>
+        <p style="font-size:0.75rem;color:var(--text3);margin-bottom:10px;">Toggle which items appear in the sidebar.</p>
+        <div id="sidebarItemToggles" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+      <!-- Playback -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:10px;color:var(--text);">▶️ Playback</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.83rem;color:var(--text2);">Autoplay next video</span>
+          <button class="toggle-sw" id="settingsAutoplayBtn" onclick="toggleAutoplay();updateSettingsUI()"></button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:0.83rem;color:var(--text2);">Default Speed</span>
+          <select id="defaultSpeedSel" onchange="setDefaultSpeed(this.value)" style="background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:3px 8px;border-radius:6px;font-size:0.8rem;">
+            <option value="0.5">0.5×</option>
+            <option value="0.75">0.75×</option>
+            <option value="1" selected>1× (Normal)</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Data -->
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;">
+        <div style="font-size:0.85rem;font-weight:600;margin-bottom:10px;color:var(--text);">🗑️ Data</div>
+        <button onclick="clearAllData()" style="padding:7px 16px;background:rgba(255,0,0,0.15);border:1px solid rgba(255,0,0,0.3);color:var(--red);border-radius:8px;font-size:0.82rem;cursor:pointer;width:100%;">Clear All Data (history, likes, subs)</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeSettings()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal-overlay" id="termsModal" style="display:none;" onclick="if(event.target===this)closeTerms()">
+  <div class="modal-box" style="max-width:600px;max-height:80vh;overflow-y:auto;">
+    <h3>📜 Terms of Service</h3>
+    <div style="font-size:0.82rem;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+      <p style="margin-bottom:10px;color:var(--text);font-weight:600;">Last updated: 2025</p>
+      <p style="margin-bottom:8px;">Welcome to <strong>HMSCLASS</strong>, a video platform for Hicksville Middle School students. By using this site, you agree to the following terms:</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">1. Eligibility</p>
+      <p style="margin-bottom:10px;">HMSCLASS is intended for students aged 13 and older affiliated with Hicksville Ohio Schools. Content rated above PG-13 is not permitted. By using this platform, you confirm you are at least 13 years of age.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">2. Acceptable Use</p>
+      <p style="margin-bottom:10px;">You agree to use HMSCLASS only for lawful, educational, or entertainment purposes appropriate for school audiences. You may not use the platform to access, share, or distribute inappropriate, harmful, or illegal content.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">3. Video Content</p>
+      <p style="margin-bottom:10px;">All videos are sourced from YouTube via YouTube's public API and are subject to YouTube's own Terms of Service. HMSCLASS does not host any video content directly. We do not guarantee availability or accuracy of any video.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">4. Privacy</p>
+      <p style="margin-bottom:10px;">HMSCLASS stores watch history, likes, and subscriptions locally in your browser only. No personal data is collected or transmitted to any server by HMSCLASS. Your YouTube viewing may be subject to YouTube/Google's privacy policy.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">5. No Ads</p>
+      <p style="margin-bottom:10px;">HMSCLASS does not display advertisements and does not sell your data. Some embedded YouTube videos may contain YouTube's own ads, which are outside our control.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">6. Disclaimer</p>
+      <p style="margin-bottom:10px;">HMSCLASS is provided "as is" for educational and entertainment use. We make no warranties about availability, accuracy, or fitness for any particular purpose.</p>
+      <p style="margin-bottom:6px;font-weight:600;color:var(--text);">7. Changes</p>
+      <p style="margin-bottom:10px;">We reserve the right to update these Terms at any time. Continued use of HMSCLASS after changes constitutes acceptance of the updated Terms.</p>
+      <p style="color:var(--text3);font-size:0.78rem;">HMSCLASS is a student project affiliated with Hicksville Ohio Schools. Go Blue Aces! 🏃‍♂️</p>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-go" onclick="closeTerms()">I Agree ✓</button>
+    </div>
+  </div>
+</div>
+
 <!-- Import Modal -->
 <div class="modal-overlay" id="importModal" style="display:none;" onclick="if(event.target===this)closeImport()">
   <div class="modal-box">
@@ -287,8 +431,10 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
         <rect width="44" height="30" rx="8" fill="#FF0000"/>
         <path d="M18 9L30 15L18 21V9Z" fill="white"/>
         <circle cx="38" cy="6" r="5" fill="#0f0f0f" stroke="#FF0000" stroke-width="1.5"/>
-        <text x="38" y="9.5" text-anchor="middle" font-size="6" fill="#FF0000" font-weight="900" font-family="Arial">H</text>
+        <text x="38" y="10" text-anchor="middle" font-size="8" fill="#FF0000" font-weight="900" font-family="Arial">H</text>
       </svg>
+      <!-- Hicksville Ohio Schools ace symbol -->
+      <img src="data:image/webp;base64,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" width="28" height="28" style="border-radius:50%;margin-right:2px;" title="Hicksville Ohio Schools" alt="HMS"/>
       <span class="logo-wordmark">HMS<span>CLASS</span></span>
     </div>
 
@@ -305,6 +451,8 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
     <div class="header-right">
       <!-- Dark/Light mode -->
       <button class="icon-btn" onclick="toggleMode()" id="modeBtn" title="Toggle dark/light mode">🌙</button>
+      <!-- Settings -->
+      <button class="icon-btn" onclick="showSettings()" title="Settings">⚙️</button>
       <!-- Import -->
       <button class="icon-btn" onclick="showImport()" title="Import URL">➕</button>
       <!-- GitHub -->
@@ -318,40 +466,45 @@ a{color:inherit;text-decoration:none;}button{font-family:inherit;cursor:pointer;
 <!-- Filter Chips -->
 <div class="chips-bar" id="chipsBar">
   <button class="chip" id="chip-all" onclick="chipSelect(this,'')">All</button>
-  <button class="chip outline" onclick="chipSelect(this,'trending')">🔥 Trending</button>
-  <button class="chip outline" onclick="showSection('shorts')">⚡ Shorts</button>
-  <button class="chip outline" onclick="showSection('movies')">🎬 Movies</button>
-  <button class="chip outline" onclick="showSection('history')">🕒 History</button>
-  <button class="chip outline" onclick="chipSelect(this,'gaming')">🎮 Gaming</button>
-  <button class="chip outline" onclick="chipSelect(this,'music')">🎵 Music</button>
-  <button class="chip outline" onclick="chipSelect(this,'sports')">⚽ Sports</button>
-  <button class="chip outline" onclick="chipSelect(this,'news')">📰 News</button>
-  <button class="chip outline" onclick="chipSelect(this,'technology')">💻 Tech</button>
-  <button class="chip outline" onclick="chipSelect(this,'cooking')">🍳 Cooking</button>
-  <button class="chip outline" onclick="chipSelect(this,'science')">🔬 Science</button>
-  <button class="chip outline" onclick="chipSelect(this,'comedy')">😂 Comedy</button>
-  <button class="chip outline" onclick="chipSelect(this,'anime')">🎌 Anime</button>
+  <button class="chip outline" id="chip-trending" onclick="chipSelect(this,'trending')">🔥 Trending</button>
+  <button class="chip outline" id="chip-shorts" onclick="showSection('shorts')">⚡ Shorts</button>
+  <button class="chip outline" id="chip-movies" onclick="showSection('movies')">🎬 Movies</button>
+  <button class="chip outline" id="chip-history" onclick="showSection('history')">🕒 History</button>
+  <button class="chip outline" id="chip-gaming" onclick="chipSelect(this,'gaming')">🎮 Gaming</button>
+  <button class="chip outline" id="chip-music" onclick="chipSelect(this,'music')">🎵 Music</button>
+  <button class="chip outline" id="chip-sports-gen" onclick="chipSelect(this,'sports')">⚽ Sports</button>
+  <button class="chip outline" id="chip-news" onclick="chipSelect(this,'news')">📰 News</button>
+  <button class="chip outline" id="chip-tech" onclick="chipSelect(this,'technology')">💻 Tech</button>
+  <button class="chip outline" id="chip-cooking" onclick="chipSelect(this,'cooking')">🍳 Cooking</button>
+  <button class="chip outline" id="chip-science" onclick="chipSelect(this,'science')">🔬 Science</button>
+  <button class="chip outline" id="chip-comedy" onclick="chipSelect(this,'comedy')">😂 Comedy</button>
+  <button class="chip outline" id="chip-track" onclick="showSection('sports')">🏃 Track & Sports</button>
 </div>
 
 <div class="page-wrap">
   <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-item active" id="si-home" onclick="goHome()"><span class="si-icon">🏠</span>Home</div>
-    <div class="sidebar-item" onclick="loadTrending()"><span class="si-icon">🔥</span>Trending</div>
-    <div class="sidebar-item" onclick="showSection('shorts')"><span class="si-icon">⚡</span>Shorts</div>
-    <div class="sidebar-item" onclick="showSection('movies')"><span class="si-icon">🎬</span>Movies</div>
+  <aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-toggle-row">
+      <button class="sidebar-toggle-btn" onclick="cycleSidebar()" id="sidebarToggleBtn" title="Collapse sidebar">◀</button>
+    </div>
+    <div class="sidebar-item active" id="si-home" onclick="goHome()"><span class="si-icon">🏠</span><span class="si-label">Home</span></div>
+    <div class="sidebar-item" onclick="loadTrending()"><span class="si-icon">🔥</span><span class="si-label">Trending</span></div>
+    <div class="sidebar-item" id="si-shorts" onclick="showSection('shorts')"><span class="si-icon">⚡</span><span class="si-label">Shorts</span></div>
+    <div class="sidebar-item" id="si-movies" onclick="showSection('movies')"><span class="si-icon">🎬</span><span class="si-label">Movies</span></div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">You</div>
-    <div class="sidebar-item" onclick="showSection('history')"><span class="si-icon">🕒</span>History</div>
-    <div class="sidebar-item" onclick="showSection('subscriptions')"><span class="si-icon">🔔</span>Subscriptions</div>
+    <div class="sidebar-item" id="si-history" onclick="showSection('history')"><span class="si-icon">🕒</span><span class="si-label">History</span></div>
+    <div class="sidebar-item" id="si-subs" onclick="showSection('subscriptions')"><span class="si-icon">🔔</span><span class="si-label">Subscriptions</span></div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Categories</div>
-    <div class="sidebar-item" onclick="chipSelect(null,'gaming')"><span class="si-icon">🎮</span>Gaming</div>
-    <div class="sidebar-item" onclick="chipSelect(null,'music')"><span class="si-icon">🎵</span>Music</div>
-    <div class="sidebar-item" onclick="chipSelect(null,'sports')"><span class="si-icon">⚽</span>Sports</div>
+    <div class="sidebar-item" id="si-gaming" onclick="chipSelect(null,'gaming')"><span class="si-icon">🎮</span><span class="si-label">Gaming</span></div>
+    <div class="sidebar-item" id="si-music" onclick="chipSelect(null,'music')"><span class="si-icon">🎵</span><span class="si-label">Music</span></div>
+    <div class="sidebar-item" id="si-track" onclick="showSection('sports')"><span class="si-icon">🏃</span><span class="si-label">Track & Sports</span></div>
     <div class="sidebar-divider"></div>
-    <div class="sidebar-item" onclick="showImport()"><span class="si-icon">➕</span>Import URL</div>
-    <div class="sidebar-item" onclick="window.open('https://github.com/TFRzombie/HTMLCLASS','_blank')"><span class="si-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></span>GitHub</div>
+    <div class="sidebar-item" id="si-import" onclick="showImport()"><span class="si-icon">➕</span><span class="si-label">Import URL</span></div>
+    <div class="sidebar-item" id="si-settings" onclick="showSettings()"><span class="si-icon">⚙️</span><span class="si-label">Settings</span></div>
+    <div class="sidebar-item" id="si-terms" onclick="showTerms()"><span class="si-icon">📜</span><span class="si-label">Terms of Service</span></div>
+    <div class="sidebar-item" id="si-github" onclick="window.open('https://github.com/TFRzombie/HTMLCLASS','_blank')"><span class="si-icon">🐙</span><span class="si-label">GitHub</span></div>
   </aside>
 
   <main class="main" id="mainArea">
@@ -423,16 +576,29 @@ function showToast(msg){const t=document.getElementById("kbToast");t.textContent
 function toggleMode(){lightMode=!lightMode;document.body.classList.toggle("light",lightMode);localStorage.setItem("hms_light",lightMode?"1":"0");document.getElementById("modeBtn").textContent=lightMode?"☀️":"🌙";}
 window.onload=()=>{document.getElementById("modeBtn").textContent=lightMode?"☀️":"🌙";loadTrending();};
 
-// ── TRENDING ──
+// ── TRENDING / PERSONALIZED ──
 async function loadTrending(catId=""){
   showSpinner();
   try{
-    let url=`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics,status&chart=mostPopular&maxResults=24&regionCode=US&key=${gak()}`;
-    if(catId)url+=`&videoCategoryId=${catId}`;
-    const data=await fj(url);
-    const items=data.items.filter(v=>v.status?.embeddable!==false);
-    curPageTok="";
-    renderGrid(items,"trending",true,"🔥 Trending","");
+    // If we have history or subs, show personalized content
+    const hasPersonal=watchHistory.length>0||subscriptions.length>0;
+    if(hasPersonal&&!catId){
+      // Build search terms from recent history titles + subscribed channels
+      const histTerms=watchHistory.slice(0,5).map(h=>h.title.split(" ").slice(0,3).join(" "));
+      const subTerms=subscriptions.slice(0,3);
+      const allTerms=[...histTerms,...subTerms].filter(Boolean);
+      const searchTerm=allTerms[Math.floor(Math.random()*allTerms.length)]||"trending videos";
+      const data=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(searchTerm)}&type=video&maxResults=24&order=relevance&videoEmbeddable=true&key=${gak()}`);
+      curPageTok=data.nextPageToken||"";
+      renderGrid(data.items,"search",true,"🔥 Recommended For You","Based on your watch history");
+    } else {
+      let url=`https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics,status&chart=mostPopular&maxResults=24&regionCode=US&key=${gak()}`;
+      if(catId)url+=`&videoCategoryId=${catId}`;
+      const data=await fj(url);
+      const items=data.items.filter(v=>v.status?.embeddable!==false);
+      curPageTok="";
+      renderGrid(items,"trending",true,"🔥 Trending","");
+    }
   }catch(e){nk();showGridErr("Failed to load. "+e.message);}
 }
 
@@ -608,10 +774,10 @@ async function openWatch(id,title,channel,itemData){
           <button class="ctrl-btn" onclick="showDownloadPicker()" title="Download" id="dlBtn" style="position:relative;">⬇ Download
             <div id="dlPicker" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);box-shadow:var(--shadow);min-width:220px;z-index:500;overflow:hidden;">
               <div style="padding:8px 12px;font-size:0.72rem;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);">Download via</div>
-              <a id="dl-cobalt"   target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">🌊 <span><b>Cobalt</b> — clean, no ads (recommended)</span></a>
+              <a id="dl-renderfire" target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">🔥 <span><b>RenderFire</b> — <span style="color:#22c55e;font-size:0.75rem;">★ RECOMMENDED</span></span></a>
+              <a id="dl-cobalt"   target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">🌊 <span><b>Cobalt</b> — clean, no ads</span></a>
               <a id="dl-y2mate"   target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">⬇ <span><b>Y2Mate</b> — MP4 &amp; MP3</span></a>
               <a id="dl-yt5s"     target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">🎬 <span><b>yt5s</b> — multiple qualities</span></a>
-              <a id="dl-paste"    target="_blank" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:0.85rem;color:var(--text);text-decoration:none;transition:background 0.15s;" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''" onclick="closeDlPicker()">📋 <span><b>PasteDownload</b> — no signup</span></a>
               <div style="padding:8px 12px;font-size:0.7rem;color:var(--text3);border-top:1px solid var(--border);">Opens a new tab. Paste the video URL if needed.</div>
             </div>
           </button>
@@ -671,8 +837,9 @@ function startProgressSim(){
     if(progressPct>=100&&autoplayOn){
       clearInterval(progressTimer);
       // Autoplay next related
-      const first=document.querySelector("#relatedList .mini-card");
-      if(first){showToast("▶ Autoplaying next...");setTimeout(()=>first.click(),1200);}
+      const cards=document.querySelectorAll("#relatedList .mini-card");
+      const first=cards[0];
+      if(first){showToast("▶ Autoplaying next...");setTimeout(()=>{first.click();},1500);}
     }
   },3000);
 }
@@ -689,19 +856,52 @@ function seekVideo(e){
   showToast(`⏩ Jumped to ${Math.round(pct)}%`);
 }
 
+// Drag-to-seek support
+(function(){
+  let seeking=false;
+  document.addEventListener("mousedown",e=>{
+    const wrap=document.getElementById("progressWrap");
+    if(wrap&&wrap.contains(e.target)){seeking=true;seekVideo(e);}
+  });
+  document.addEventListener("mousemove",e=>{
+    if(!seeking)return;
+    const wrap=document.getElementById("progressWrap");
+    if(wrap){
+      const rect=wrap.getBoundingClientRect();
+      const pct=Math.max(0,Math.min(100,((e.clientX-rect.left)/rect.width)*100));
+      progressPct=pct;
+      const fill=document.getElementById("progressFill");
+      if(fill){fill.style.width=pct+"%";fill.className="progress-fill "+(pct>=95?"full":"partial");}
+    }
+  });
+  document.addEventListener("mouseup",e=>{
+    if(seeking){seeking=false;saveProgress(curVideoId,Math.round(progressPct));}
+  });
+})();
+
 function toggleDesc(){descEx=!descEx;document.getElementById("descText")?.classList.toggle("ex",descEx);const t=document.getElementById("descToggle");if(t)t.textContent=descEx?"Show less":"Show more";}
 function fixPlayer(){const f=document.getElementById("watchIframe");if(f)f.src=`https://www.youtube-nocookie.com/embed/${curVideoId}?autoplay=1&rel=0&vq=hd720`;showToast("🔧 Attempting fix...");}
-function setSpeed(s){playbackSpeed=parseFloat(s);showToast(`⏱ Speed: ${s}×`);/* iframe postMessage would require same-origin; just display notification */}
+function setSpeed(s){
+  playbackSpeed=parseFloat(s);
+  showToast(`⏱ Speed: ${s}×`);
+  // Try to set speed on iframe via postMessage (works when YouTube JS API is enabled)
+  const iframe=document.getElementById("watchIframe");
+  if(iframe){
+    iframe.contentWindow?.postMessage(JSON.stringify({event:"command",func:"setPlaybackRate",args:[parseFloat(s)]}),"*");
+  }
+  // Also reload the iframe with the speed param encoded
+  // We store it for when iframe is reloaded
+  localStorage.setItem("hms_speed",s);
+}
 function showDownloadPicker(){
   const picker=document.getElementById("dlPicker");
   if(!picker)return;
   const ytUrl=`https://www.youtube.com/watch?v=${curVideoId}`;
   const enc=encodeURIComponent(ytUrl);
-  // Set hrefs for each service — all currently working as of 2026
+  document.getElementById("dl-renderfire").href=`https://renderfire.com/free-tools/video/youtube/youtube-downloader?url=${enc}`;
   document.getElementById("dl-cobalt").href=`https://cobalt.tools/?u=${enc}`;
   document.getElementById("dl-y2mate").href=`https://www.y2mate.com/youtube/${curVideoId}`;
   document.getElementById("dl-yt5s").href=`https://yt5s.io/en68/?q=${enc}`;
-  document.getElementById("dl-paste").href=`https://pastedownload.com/?url=${enc}`;
   const isOpen=picker.style.display==="block";
   picker.style.display=isOpen?"none":"block";
   if(!isOpen)showToast("⬇ Pick a download site");
@@ -802,38 +1002,305 @@ async function showSection(sec){
         });
       }catch(e){}
     }
-  } else if(sec==="shorts"){
-    const data=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=shorts+vertical+video&type=video&maxResults=24&videoDuration=short&videoEmbeddable=true&key=${gak()}`).catch(()=>({items:[]}));
+  } else if(sec==="sports"){
     const sp=document.getElementById("specialSection");
-    sp.innerHTML=`<div class="section-head"><div class="section-title">⚡ Shorts</div></div>
-      <div class="shorts-grid">${(data.items||[]).map(item=>{
-        const id=item.id?.videoId||"";if(!id)return"";
-        const sn=item.snippet||{};const t=sn.title||"";const th=sn.thumbnails?.medium?.url||"";
-        return`<div class="short-card" onclick="openWatch('${id}','${esc(t).replace(/'/g,"\\'")}','${esc(sn.channelTitle||"")}',{snippet:${JSON.stringify({title:t,channelTitle:sn.channelTitle||"",publishedAt:sn.publishedAt||"",description:""}).replace(/</g,"\\u003c")}})">
-          <div class="short-thumb"><img src="${esc(th)}" loading="lazy"/><div class="short-play">▶</div></div>
-          <div class="short-info"><div class="short-title">${esc(t)}</div></div>
-        </div>`;
-      }).join("")}</div>`;
+    // Show FULLPAGE track agree overlay — blocks content area but keeps header/chips/sidebar usable
+    const trackVids=["track and field highlights","100m sprint world record","relay race championship","hurdles race highlights","long jump world record","pole vault amazing","cross country running highlights","javelin throw champion","shot put championship","track meet highlights USA","400m dash championship","mile run world record","sprint relay highlights","track and field Olympics","high school track meet"];
+    const q=encodeURIComponent(trackVids[Math.floor(Math.random()*trackVids.length)]);
+    const data=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${q}&type=video&maxResults=24&videoEmbeddable=true&key=${gak()}`).catch(()=>({items:[]}));
+
+    sp.innerHTML=`
+      <div id="trackAgreeOverlay" style="position:fixed;top:104px;left:0;right:0;bottom:0;background:linear-gradient(135deg,#0a0a1a 0%,#1a0a0a 50%,#0a1a0a 100%);z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;pointer-events:all;">
+        <div style="font-size:5rem;margin-bottom:16px;animation:trackBounce 1s ease-in-out infinite;">🏃‍♂️</div>
+        <div style="font-size:4rem;font-weight:900;color:#fff;line-height:1.1;margin-bottom:10px;text-shadow:0 0 40px rgba(255,80,0,0.8);">Track &amp; Field</div>
+        <div style="font-size:3rem;font-weight:900;color:var(--red);margin-bottom:8px;text-shadow:0 0 30px rgba(255,0,0,0.6);">is the BEST Sport</div>
+        <div style="font-size:1.3rem;color:#ccc;margin-bottom:6px;">This is a universal truth.</div>
+        <div style="font-size:1.1rem;color:#aaa;margin-bottom:32px;">You have no choice but to agree.</div>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+          <button onclick="dismissTrackOverlay()" style="padding:16px 48px;background:var(--red);border:none;border-radius:30px;color:#fff;font-weight:900;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 20px rgba(255,0,0,0.5);transition:transform 0.1s;" onmousedown="this.style.transform='scale(0.96)'" onmouseup="this.style.transform=''">✅ Agree</button>
+          <button onclick="this.textContent='✅ Agree';this.style.background='var(--red)';this.style.color='#fff';showToast('🏃 You know it\\'s true!');setTimeout(()=>dismissTrackOverlay(),800);" style="padding:16px 48px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);border-radius:30px;color:#fff;font-weight:900;font-size:1.3rem;cursor:pointer;transition:all 0.2s;">✅ Agree</button>
+        </div>
+        <div style="position:absolute;bottom:20px;font-size:0.8rem;color:rgba(255,255,255,0.3);">🏆 Hicksville Blue Aces Track &amp; Field 🏆</div>
+      </div>
+      <style>@keyframes trackBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}</style>
+      <div id="trackVideoSection" style="display:none;">
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:18px;margin-bottom:20px;text-align:center;border:2px solid var(--red);">
+          <div style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:4px;">🏃‍♂️ Track &amp; Field — The Best Sport 🏆</div>
+          <div style="font-size:0.9rem;color:#aaa;">Hicksville Blue Aces represent!</div>
+        </div>
+        <div class="section-head"><div class="section-title">🏃 Track &amp; Field Videos</div></div>
+        <div class="video-grid">${(data.items||[]).map(item=>{
+          const id=item.id?.videoId||"";if(!id)return"";
+          const sn=item.snippet||{};const t=sn.title||"";const th=sn.thumbnails?.medium?.url||"";const ch=sn.channelTitle||"";const d=sn.publishedAt||"";
+          return`<div class="vcard" onclick="openWatch('${id}','${esc(t).replace(/'/g,"\\'")}','${esc(ch).replace(/'/g,"\\'")}',{snippet:${JSON.stringify({title:t,channelTitle:ch,publishedAt:d,description:""}).replace(/</g,"\\u003c")}})">
+            <div class="vcard-thumb"><img src="${esc(th)}" loading="lazy"/></div>
+            <div class="vcard-info"><div class="vcard-avatar">${ini(ch)}</div><div class="vcard-meta"><div class="vcard-title">${esc(t)}</div><div class="vcard-channel">${esc(ch)}</div><div class="vcard-stats">${fmtD(d)}</div></div></div>
+          </div>`;
+        }).join("")}</div>
+      </div>`;
+    showSpecial();
+  } else if(sec==="shorts"){
+    showSpinner();
+    const sp=document.getElementById("specialSection");
+    const shortQueries=["funny shorts","viral shorts","comedy shorts","satisfying shorts","amazing shorts","cool shorts","wow shorts","sports shorts","prank shorts","life hacks shorts","animals shorts","cooking shorts","dance shorts","gaming shorts","music shorts"];
+    // Load first batch
+    const q=shortQueries[Math.floor(Math.random()*shortQueries.length)];
+    const data=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=20&videoDuration=short&videoEmbeddable=true&key=${gak()}`).catch(()=>({items:[]}));
+    const validItems=(data.items||[]).filter(i=>i.id?.videoId);
+    if(!validItems.length){sp.innerHTML=`<p style="padding:2rem;color:var(--text2);text-align:center;">No shorts found.</p>`;showSpecial();return;}
+    window._shortIds=validItems.map(i=>i.id.videoId);
+    window._shortTitles=validItems.map(i=>i.snippet?.title||"");
+    window._shortChannels=validItems.map(i=>i.snippet?.channelTitle||"");
+    window._shortIdx=0;
+    window._shortQueries=shortQueries;
+    window._shortLoading=false;
+
+    sp.innerHTML=`
+      <div id="shortsViewer" style="position:fixed;inset:0;background:#000;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:1.1rem;font-weight:700;color:#fff;z-index:10;letter-spacing:1px;">⚡ Shorts</div>
+        <button onclick="document.getElementById('shortsViewer').remove();window._shortIds=null;showSection&&showSpecial();" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.1rem;border-radius:50%;width:36px;height:36px;cursor:pointer;z-index:10;">✕</button>
+        <div style="position:relative;width:100%;max-width:420px;height:100%;display:flex;align-items:center;justify-content:center;">
+          <iframe id="shortIframe" src="https://www.youtube-nocookie.com/embed/${window._shortIds[0]}?autoplay=1&rel=0&modestbranding=1" allowfullscreen allow="autoplay;accelerometer;clipboard-write;encrypted-media;gyroscope;picture-in-picture" style="width:100%;height:100%;border:none;max-height:720px;border-radius:12px;"></iframe>
+        </div>
+        <div style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);color:#fff;font-size:0.88rem;font-weight:500;text-align:center;max-width:320px;text-shadow:0 1px 4px rgba(0,0,0,0.8);padding:0 16px;" id="shortTitle">${esc(window._shortTitles[0])}</div>
+        <div style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);color:#aaa;font-size:0.78rem;" id="shortCh">${esc(window._shortChannels[0])}</div>
+        <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <button id="shortPrevBtn" onclick="navigateShort(-1)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:1.5rem;border-radius:50%;width:48px;height:48px;cursor:pointer;opacity:0.4;" disabled>▲</button>
+          <button id="shortNextBtn" onclick="navigateShort(1)" style="background:rgba(255,255,255,0.88);border:none;color:#000;font-size:1.5rem;border-radius:50%;width:48px;height:48px;cursor:pointer;">▼</button>
+        </div>
+        <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:0.72rem;color:#666;" id="shortCounter">1 / ∞</div>
+        <div id="shortLoadingIndicator" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.7);border-radius:12px;padding:16px 24px;color:#fff;font-size:0.9rem;">Loading more...</div>
+      </div>`;
     showSpecial();
   } else if(sec==="movies"){
-    const queries=["full movie free","documentary full movie","classic film full movie free","free full length movie"];
-    const q=queries[Math.floor(Math.random()*queries.length)];
-    const data=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=24&videoDuration=long&videoEmbeddable=true&key=${gak()}`).catch(()=>({items:[]}));
+    const movieQueries=["full movie free family","animated full movie free","adventure full movie free","comedy full movie free","PG movie full free YouTube","kids movie full free","documentary full movie","classic movie full free","cartoon movie full","sci-fi adventure movie free full"];
+    const allMovieResults=[];
+    for(let i=0;i<3;i++){
+      const mq=movieQueries[Math.floor(Math.random()*movieQueries.length)];
+      try{const d=await fj(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(mq)}&type=video&maxResults=12&videoDuration=long&videoEmbeddable=true&key=${gak()}`);(d.items||[]).forEach(item=>{if(item.id?.videoId&&!allMovieResults.find(x=>x.id?.videoId===item.id.videoId))allMovieResults.push(item);});}catch(e){}
+    }
+    const ratingsMap={"family":"G","kids":"G","animated":"PG","animation":"PG","cartoon":"PG","documentary":"PG","classic":"PG","adventure":"PG","comedy":"PG","sci-fi":"PG-13","action":"PG-13","thriller":"PG-13"};
+    function guessRating(title){const t=title.toLowerCase();for(const[k,v]of Object.entries(ratingsMap)){if(t.includes(k))return v;}return"PG";}
+    const ratingColors={"G":"#22c55e","PG":"#3ea6ff","PG-13":"#f97316"};
     const sp=document.getElementById("specialSection");
-    sp.innerHTML=`<div class="section-head"><div class="section-title">🎬 Free Movies</div><div class="result-meta">Full-length movies available free on YouTube</div></div>
-      <div class="movies-grid">${(data.items||[]).map(item=>{
+    sp.innerHTML=`<div class="section-head"><div class="section-title">🎬 Free Movies</div><div class="result-meta">Full-length movies · 13+ appropriate · Ratings shown</div></div>
+      <div class="movies-grid">${allMovieResults.map(item=>{
         const id=item.id?.videoId||"";if(!id)return"";
         const sn=item.snippet||{};const t=sn.title||"";const th=sn.thumbnails?.medium?.url||sn.thumbnails?.default?.url||"";
+        const rating=guessRating(t);
         return`<div class="movie-card" onclick="openWatch('${id}','${esc(t).replace(/'/g,"\\'")}','${esc(sn.channelTitle||"")}',{snippet:${JSON.stringify({title:t,channelTitle:sn.channelTitle||"",publishedAt:sn.publishedAt||"",description:""}).replace(/</g,"\\u003c")}})">
-          <div class="movie-poster"><img src="${esc(th)}" loading="lazy"/><div class="movie-badge">▶ FULL</div><div class="movie-free-badge">FREE</div></div>
+          <div class="movie-poster"><img src="${esc(th)}" loading="lazy"/><div class="movie-badge">▶ FULL</div><div class="movie-free-badge">FREE</div><div style="position:absolute;bottom:6px;left:6px;background:${ratingColors[rating]||"#888"};color:#fff;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:3px;">${rating}</div></div>
           <div class="movie-info"><div class="movie-title">${esc(t)}</div><div class="movie-meta">${esc(sn.channelTitle||"")}</div></div>
         </div>`;
       }).join("")}
-      <p style="grid-column:1/-1;font-size:0.78rem;color:var(--text3);padding-top:8px;">Movies play through the privacy-enhanced embed. Content is sourced from public YouTube uploads.</p>
+      <p style="grid-column:1/-1;font-size:0.78rem;color:var(--text3);padding-top:8px;">Movies from public YouTube uploads. Ratings are estimated. No 18+ content.</p>
     </div>`;
     showSpecial();
   }
 }
+
+// ── SHORTS NAVIGATION ──
+async function navigateShort(dir){
+  const ids=window._shortIds||[];
+  const titles=window._shortTitles||[];
+  const channels=window._shortChannels||[];
+  let idx=(window._shortIdx||0)+dir;
+  if(idx<0)idx=0;
+  // If near the end, load more
+  if(dir>0&&idx>=ids.length-3&&!window._shortLoading){
+    window._shortLoading=true;
+    const loadEl=document.getElementById("shortLoadingIndicator");
+    if(loadEl)loadEl.style.display="block";
+    try{
+      const queries=window._shortQueries||["funny shorts","viral shorts","comedy shorts"];
+      const q=queries[Math.floor(Math.random()*queries.length)];
+      const data=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&videoDuration=short&videoEmbeddable=true&key=${gak()}`).then(r=>r.json());
+      (data.items||[]).forEach(item=>{
+        const id=item.id?.videoId;
+        if(id&&!window._shortIds.includes(id)){
+          window._shortIds.push(id);
+          window._shortTitles.push(item.snippet?.title||"");
+          window._shortChannels.push(item.snippet?.channelTitle||"");
+        }
+      });
+    }catch(e){}
+    if(loadEl)loadEl.style.display="none";
+    window._shortLoading=false;
+  }
+  if(idx>=window._shortIds.length)idx=window._shortIds.length-1;
+  window._shortIdx=idx;
+  const iframe=document.getElementById("shortIframe");
+  const titleEl=document.getElementById("shortTitle");
+  const chEl=document.getElementById("shortCh");
+  const counter=document.getElementById("shortCounter");
+  const prevBtn=document.getElementById("shortPrevBtn");
+  const nextBtn=document.getElementById("shortNextBtn");
+  if(iframe)iframe.src=`https://www.youtube-nocookie.com/embed/${window._shortIds[idx]}?autoplay=1&rel=0&modestbranding=1`;
+  if(titleEl)titleEl.textContent=window._shortTitles[idx]||"";
+  if(chEl)chEl.textContent=window._shortChannels[idx]||"";
+  if(counter)counter.textContent=`${idx+1} / ∞`;
+  if(prevBtn){prevBtn.disabled=idx===0;prevBtn.style.opacity=idx===0?"0.4":"1";}
+  if(nextBtn){nextBtn.style.background=window._shortLoading?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.88)";}
+}
+
+// Touch swipe for shorts
+let _touchStartY=0;
+document.addEventListener("touchstart",e=>{if(document.getElementById("shortsViewer"))_touchStartY=e.touches[0].clientY;});
+document.addEventListener("touchend",e=>{
+  if(!document.getElementById("shortsViewer"))return;
+  const dy=_touchStartY-e.changedTouches[0].clientY;
+  if(Math.abs(dy)>50){navigateShort(dy>0?1:-1);}
+});
+
+// ── SETTINGS ──
+const ALL_CHIPS=[
+  {id:"chip-all",label:"All"},
+  {id:"chip-trending",label:"🔥 Trending"},
+  {id:"chip-shorts",label:"⚡ Shorts"},
+  {id:"chip-movies",label:"🎬 Movies"},
+  {id:"chip-history",label:"🕒 History"},
+  {id:"chip-gaming",label:"🎮 Gaming"},
+  {id:"chip-music",label:"🎵 Music"},
+  {id:"chip-sports-gen",label:"⚽ Sports"},
+  {id:"chip-news",label:"📰 News"},
+  {id:"chip-tech",label:"💻 Tech"},
+  {id:"chip-cooking",label:"🍳 Cooking"},
+  {id:"chip-science",label:"🔬 Science"},
+  {id:"chip-comedy",label:"😂 Comedy"},
+  {id:"chip-track",label:"🏃 Track & Sports"},
+];
+const ALL_SIDEBAR_ITEMS=[
+  {id:"si-home",label:"🏠 Home"},
+  {id:"si-shorts",label:"⚡ Shorts"},
+  {id:"si-movies",label:"🎬 Movies"},
+  {id:"si-history",label:"🕒 History"},
+  {id:"si-subs",label:"🔔 Subscriptions"},
+  {id:"si-gaming",label:"🎮 Gaming"},
+  {id:"si-music",label:"🎵 Music"},
+  {id:"si-track",label:"🏃 Track & Sports"},
+  {id:"si-import",label:"➕ Import URL"},
+  {id:"si-settings",label:"⚙️ Settings"},
+  {id:"si-terms",label:"📜 Terms of Service"},
+  {id:"si-github",label:"🐙 GitHub"},
+];
+let hiddenChips=JSON.parse(localStorage.getItem("hms_hidden_chips")||"[]");
+let hiddenSidebarItems=JSON.parse(localStorage.getItem("hms_hidden_sidebar")||"[]");
+let sidebarMode=localStorage.getItem("hms_sidebar_mode")||"full";
+
+function applySidebarMode(mode){
+  sidebarMode=mode;
+  const sb=document.getElementById("mainSidebar");
+  const btn=document.getElementById("sidebarToggleBtn");
+  if(!sb)return;
+  sb.classList.remove("mini","hidden");
+  if(mode==="mini"){sb.classList.add("mini");if(btn)btn.textContent="▶";}
+  else if(mode==="hidden"){sb.classList.add("hidden");if(btn)btn.textContent="▶";}
+  else{if(btn)btn.textContent="◀";}
+  localStorage.setItem("hms_sidebar_mode",mode);
+}
+function cycleSidebar(){
+  const modes=["full","mini","hidden"];
+  const idx=modes.indexOf(sidebarMode);
+  applySidebarMode(modes[(idx+1)%modes.length]);
+}
+function setSidebarMode(mode){applySidebarMode(mode);}
+
+function applyHiddenChips(){
+  ALL_CHIPS.forEach(c=>{
+    const el=document.getElementById(c.id);
+    if(el)el.style.display=hiddenChips.includes(c.id)?"none":"";
+  });
+}
+function applyHiddenSidebarItems(){
+  ALL_SIDEBAR_ITEMS.forEach(s=>{
+    const el=document.getElementById(s.id);
+    if(el)el.style.display=hiddenSidebarItems.includes(s.id)?"none":"";
+  });
+}
+
+function showSettings(){
+  updateSettingsUI();
+  buildChipToggles();
+  buildSidebarItemToggles();
+  document.getElementById("settingsModal").style.display="flex";
+}
+function closeSettings(){document.getElementById("settingsModal").style.display="none";}
+function updateSettingsUI(){
+  const mb=document.getElementById("settingsModeBtn");
+  if(mb)mb.className="toggle-sw"+(lightMode?" on":"");
+  const ab=document.getElementById("settingsAutoplayBtn");
+  if(ab)ab.className="toggle-sw"+(autoplayOn?" on":"");
+}
+
+function buildChipToggles(){
+  const container=document.getElementById("chipToggles");
+  if(!container)return;
+  container.innerHTML=ALL_CHIPS.map(c=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:0.83rem;color:var(--text);">${c.label}</span>
+      <button class="toggle-sw ${hiddenChips.includes(c.id)?'':'on'}" onclick="toggleChipVisibility('${c.id}',this)" style="flex-shrink:0;"></button>
+    </div>`).join("");
+}
+function toggleChipVisibility(chipId, btn){
+  const idx=hiddenChips.indexOf(chipId);
+  if(idx>-1){hiddenChips.splice(idx,1);btn.className="toggle-sw on";}
+  else{hiddenChips.push(chipId);btn.className="toggle-sw";}
+  localStorage.setItem("hms_hidden_chips",JSON.stringify(hiddenChips));
+  applyHiddenChips();
+}
+
+function buildSidebarItemToggles(){
+  const container=document.getElementById("sidebarItemToggles");
+  if(!container)return;
+  container.innerHTML=ALL_SIDEBAR_ITEMS.map(s=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:0.83rem;color:var(--text);">${s.label}</span>
+      <button class="toggle-sw ${hiddenSidebarItems.includes(s.id)?'':'on'}" onclick="toggleSidebarItemVisibility('${s.id}',this)" style="flex-shrink:0;"></button>
+    </div>`).join("");
+}
+function toggleSidebarItemVisibility(itemId, btn){
+  const idx=hiddenSidebarItems.indexOf(itemId);
+  if(idx>-1){hiddenSidebarItems.splice(idx,1);btn.className="toggle-sw on";}
+  else{hiddenSidebarItems.push(itemId);btn.className="toggle-sw";}
+  localStorage.setItem("hms_hidden_sidebar",JSON.stringify(hiddenSidebarItems));
+  applyHiddenSidebarItems();
+}
+
+function setAccent(color){document.documentElement.style.setProperty("--red",color);localStorage.setItem("hms_accent",color);showToast("🎨 Accent color updated!");}
+function setFontSize(size){document.body.style.fontSize=size+"px";localStorage.setItem("hms_fontsize",size);showToast("🔡 Font size: "+size+"px");}
+function setCardSize(size){document.documentElement.style.setProperty("--card-min",size+"px");document.querySelectorAll(".video-grid").forEach(g=>g.style.gridTemplateColumns=`repeat(auto-fill,minmax(${size}px,1fr))`);localStorage.setItem("hms_cardsize",size);showToast("🃏 Card size updated");}
+function setDefaultSpeed(s){playbackSpeed=parseFloat(s);localStorage.setItem("hms_speed",s);showToast("⏱ Default speed: "+s+"×");}
+function clearAllData(){
+  if(!confirm("Clear ALL data? This cannot be undone."))return;
+  ["hms_hist","hms_likes","hms_subs","hms_recent","hms_accent","hms_fontsize","hms_speed","hms_hidden_chips","hms_hidden_sidebar","hms_sidebar_mode","hms_cardsize"].forEach(k=>localStorage.removeItem(k));
+  watchHistory=[];likes=[];subscriptions=[];recentSearches=[];hiddenChips=[];hiddenSidebarItems=[];
+  applyHiddenChips();applyHiddenSidebarItems();applySidebarMode("full");
+  closeSettings();showToast("🗑️ All data cleared");
+}
+
+// ── TERMS ──
+function showTerms(){document.getElementById("termsModal").style.display="flex";}
+function closeTerms(){document.getElementById("termsModal").style.display="none";}
+
+// ── TRACK AGREE DISMISS ──
+function dismissTrackOverlay(){
+  const overlay=document.getElementById("trackAgreeOverlay");
+  if(overlay){overlay.style.transition="opacity 0.4s";overlay.style.opacity="0";setTimeout(()=>{overlay.remove();const vs=document.getElementById("trackVideoSection");if(vs)vs.style.display="block";},400);}
+  showToast("🏃 Track is #1! Let's gooo!");
+}
+
+// Apply saved settings on load
+(function(){
+  const accent=localStorage.getItem("hms_accent");if(accent)document.documentElement.style.setProperty("--red",accent);
+  const fs=localStorage.getItem("hms_fontsize");if(fs)document.body.style.fontSize=fs+"px";
+  const spd=localStorage.getItem("hms_speed");if(spd)playbackSpeed=parseFloat(spd);
+  const cs=localStorage.getItem("hms_cardsize");if(cs)document.documentElement.style.setProperty("--card-min",cs+"px");
+  hiddenChips=JSON.parse(localStorage.getItem("hms_hidden_chips")||"[]");
+  hiddenSidebarItems=JSON.parse(localStorage.getItem("hms_hidden_sidebar")||"[]");
+  sidebarMode=localStorage.getItem("hms_sidebar_mode")||"full";
+  // Apply after DOM ready
+  setTimeout(()=>{applyHiddenChips();applyHiddenSidebarItems();applySidebarMode(sidebarMode);},50);
+})();
 
 function makeSmallCard(id,title,channel,thumb,date){
   const card=document.createElement("div");card.className="vcard";
@@ -843,7 +1310,22 @@ function makeSmallCard(id,title,channel,thumb,date){
   card.onclick=()=>openWatch(id,title,channel,{snippet:{title,channelTitle:channel,publishedAt:date,description:""}});
   return card;
 }
-function clearHistory(){watchHistory=[];localStorage.setItem("hms_hist","[]");showSection("history");}
+function clearHistory(){
+  const sp=document.getElementById("specialSection");
+  // Show "trying to hide something" message
+  const overlay=document.createElement("div");
+  overlay.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;z-index:5000;backdrop-filter:blur(5px);";
+  overlay.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:30px;max-width:380px;text-align:center;box-shadow:var(--shadow);">
+    <div style="font-size:2rem;margin-bottom:10px;">🤨</div>
+    <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px;color:var(--text);">Trying to hide something?</h3>
+    <p style="font-size:0.85rem;color:var(--text2);margin-bottom:20px;">This will permanently delete all your watch history.</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="this.closest('[style*=fixed]').remove()" style="padding:8px 20px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;color:var(--text);font-size:0.88rem;cursor:pointer;">Never mind</button>
+      <button onclick="this.closest('[style*=fixed]').remove();watchHistory=[];localStorage.setItem('hms_hist','[]');showSection('history');" style="padding:8px 24px;background:var(--red);border:none;border-radius:20px;color:#fff;font-size:0.88rem;font-weight:600;cursor:pointer;">Clear</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
 function removeHistory(id){watchHistory=watchHistory.filter(x=>x.id!==id);localStorage.setItem("hms_hist",JSON.stringify(watchHistory));const el=document.getElementById("hi-"+id);if(el)el.remove();}
 
 // ── IMPORT ──
@@ -865,23 +1347,65 @@ function pickRecent(q){document.getElementById("searchInput").value=q;curQuery=q
 
 // ── NAV ──
 function goHome(){document.getElementById("searchInput").value="";document.querySelectorAll(".chip").forEach((c,i)=>{c.className=i===0?"chip":"chip outline";});loadTrending();}
-function showGridErr(msg){document.getElementById("videoGrid").innerHTML=`<p style="grid-column:1/-1;color:#f87171;padding:2rem;text-align:center;font-size:0.9rem;">${esc(msg)}</p>`;showGrid();}
+function showGridErr(msg){
+  let countdown=8;
+  const errHTML=()=>`<div style="grid-column:1/-1;text-align:center;padding:3rem 2rem;">
+    <div style="font-size:2.5rem;margin-bottom:10px;">😩</div>
+    <p style="color:var(--text);font-size:1.1rem;font-weight:700;margin-bottom:6px;">Well that stucks.</p>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:16px;">${esc(msg)}</p>
+    <div style="width:200px;background:var(--bg4);height:8px;border-radius:4px;margin:0 auto 16px;overflow:hidden;">
+      <div id="errProgBar" style="height:100%;width:67%;background:var(--red);border-radius:4px;"></div>
+    </div>
+    <p style="color:var(--text3);font-size:0.8rem;margin-bottom:14px;">Reloading in <span id="errCountdown">${countdown}</span>s...</p>
+    <button id="errReloadBtn" onclick="doErrReload()" style="padding:9px 22px;background:var(--red);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:0.9rem;cursor:pointer;">🔄 Reload Now</button>
+  </div>`;
+  document.getElementById("videoGrid").innerHTML=errHTML();
+  showGrid();
+  const tick=setInterval(()=>{
+    countdown--;
+    const el=document.getElementById("errCountdown");
+    if(el)el.textContent=countdown;
+    if(countdown<=0){clearInterval(tick);doErrReload();}
+  },1000);
+  window._errReloadTimer=tick;
+}
+function doErrReload(){
+  clearInterval(window._errReloadTimer);
+  if(curQuery)performSearch(true);else loadTrending();
+}
 
-// ── KEYBOARD SHORTCUTS ──
+// ── KEYBOARD SHORTCUTS (global - works wherever cursor is) ──
 document.addEventListener("keydown",e=>{
   const tag=document.activeElement.tagName;
+  // Allow shortcuts even when NOT focused on video - only block when typing in inputs
   if(tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT")return;
-  const iframe=document.getElementById("watchIframe");
-  if(!iframe)return;
+  // Shorts navigation takes priority when shorts viewer is open
+  if(window._shortIds&&document.getElementById("shortsViewer")){
+    if(e.key==="ArrowDown"||e.key==="s"||e.key==="S"){navigateShort(1);return;}
+    if(e.key==="ArrowUp"||e.key==="w"||e.key==="W"){navigateShort(-1);return;}
+  }
+  // Video player shortcuts - work globally
   switch(e.key){
-    case" ":e.preventDefault();showToast("⏯ Play/Pause");iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');break;
-    case"ArrowRight":e.preventDefault();showToast("⏩ +10s");break;
-    case"ArrowLeft":e.preventDefault();showToast("⏪ -10s");break;
-    case"ArrowUp":e.preventDefault();showToast("🔊 Volume up");break;
-    case"ArrowDown":e.preventDefault();showToast("🔉 Volume down");break;
-    case"f":case"F":showToast("⛶ Fullscreen");break;
-    case"m":case"M":showToast("🔇 Mute toggle");break;
-    case"Escape":closeImport();closePip();break;
+    case" ":
+      if(document.getElementById("watchSection")?.style.display!=="none"){
+        e.preventDefault();showToast("⏯ Play/Pause");
+        const iframe=document.getElementById("watchIframe");
+        if(iframe)iframe.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":""}','*');
+      }
+      break;
+    case"ArrowRight":
+      if(document.getElementById("watchSection")?.style.display!=="none"){e.preventDefault();showToast("⏩ +10s");}
+      break;
+    case"ArrowLeft":
+      if(document.getElementById("watchSection")?.style.display!=="none"){e.preventDefault();showToast("⏪ -10s");}
+      break;
+    case"f":case"F":
+      if(document.getElementById("watchSection")?.style.display!=="none")showToast("⛶ Fullscreen");
+      break;
+    case"m":case"M":
+      if(document.getElementById("watchSection")?.style.display!=="none")showToast("🔇 Mute toggle");
+      break;
+    case"Escape":closeImport();closePip();closeSettings();closeTerms();break;
   }
 });
 
