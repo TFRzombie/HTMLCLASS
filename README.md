@@ -1,5 +1,5 @@
 https://constant-magenta-l3etsucxsd.edgeone.app/
-the fixed update is in beta https://inherent-purple-5jhkooqdoo.edgeone.app/
+the fixed update is in betaV2 https://responsible-yellow-c1vatsrdq0.edgeone.app/
 Alright so you know how YouTube is blocked at Hicksville schools and it’s honestly annoying when you’re trying to watch something for class, And especially when you're bored when everyone else is state testing.
 
 Yeah, I made something for that.
