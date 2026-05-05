@@ -1,5 +1,6 @@
+websites some may not work at times because the school will block it
 https://professional-bronze-d6z8jcc73h.edgeone.app/
-the fixed update is in betaV2 https://responsible-yellow-c1vatsrdq0.edgeone.app/
+https://cerulean-panda-0d1b5d.netlify.app/
 Alright so you know how YouTube is blocked at Hicksville schools and it’s honestly annoying when you’re trying to watch something for class, And especially when you're bored when everyone else is state testing.
 
 Yeah, I made something for that.
