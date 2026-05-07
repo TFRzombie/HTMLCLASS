@@ -1,5 +1,9 @@
 websites some may not work at times because the school will block it big update 
 https://professional-bronze-d6z8jcc73h.edgeone.app/
+
+
+
+beta links https://itchy-maroon-bitnliuex7.edgeone.app/
 Alright so you know how YouTube is blocked at Hicksville schools and it’s honestly annoying when you’re trying to watch something for class, And especially when you're bored when everyone else is state testing.
 
 Yeah, I made something for that.
