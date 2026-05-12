@@ -29,8 +29,6 @@ If you’re at Hicksville and you’ve ever been annoyed by YouTube being blocke
 
 If you're having any issues please comment on this Github page or talk to Colton Slattery About the issue
 
-BTW I GOT THE IDEA FROM WETUBE, THANK Wetube for having it open source. I would I would have never been able to figure this out without your Guys this video player.
-
 
 The site might be slow this year but I will try to fix that eventually but right now I'm focused on other things especially since state testing is coming I don't got much time I will try to do it during track meets. 
 If your site is not loading correctly or is turning white Please host it yourself using a html site hoster. This issue should be fixed sometime after state testing or during state testing.
